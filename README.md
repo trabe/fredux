@@ -1,4 +1,6 @@
-# Description
+# Fredux
+
+## Description
 
 [Redux](https://github.com/reactjs/redux) is a very simple framework that helps you build javascript applications. Sometimes this simplicity could cause problems because of:
 
@@ -10,19 +12,19 @@
 
 Fredux is a utility library to make the development process of redux applications faster and easier. Fredux provides some conventions and tools to solve the problems mentioned before.
 
-# Features
+## Features
 
 * Support for [FSA](https://github.com/acdlite/flux-standard-action) action definition and creation.
 * Support for asynchronous action handling through a middleware.
 * Support for state versioning to handle context changes.
 
-# Install
+## Install
 
 ```
 npm install fredux
 ```
 
-## Setting up fredux async action middleware
+### Setting up fredux async action middleware
 
 Add the asyncActionMiddleware to the store
 
@@ -32,7 +34,7 @@ import { asyncActionMiddleware } from "fredux";
 const store = createStore(reducer, applyMiddleware(asyncActionMiddleware));
 ```
 
-## Fredux version middleware
+### Fredux version middleware
 
 Use the fredux version middleware if you want to handle context changes, for example a navigation to another page.
 
@@ -55,11 +57,11 @@ const reducer = combineReducers({ version, otherStuff });
 ```
 
 
-# Usage
+## Usage
 
-## Using the fredux actions
+### Using the fredux actions
 
-### Synchronous actions
+#### Synchronous actions
 
 ```
 import { syncAction } from "fredux";
@@ -86,7 +88,7 @@ MESSAGE.create(3, 4);
 ```
 
 
-### Asynchronous actions
+#### Asynchronous actions
 
 ```
 import { asyncAction } from "fredux";
