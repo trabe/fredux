@@ -10,37 +10,47 @@ function getVersion(store) {
   return store.getState().version;
 }
 
-export const asyncActionMiddleware = store => next => action => {
-  const apiCall = action[ASYNC_CALL];
+export const asyncActionMiddleware = store => next => {
+  let i = 0;
 
-  if (!apiCall) {
-    return next(action);
+  function nextId() {
+    return ++i;
   }
 
-  const { request, types } = apiCall;
-  const version = getVersion(store);
+  return action => {
+    const apiCall = action[ASYNC_CALL];
 
-  store.dispatch(deleteApiCall({ ...action, type: types.REQUEST.TYPE, version }));
-  request().then(
-    response => store.dispatch(deleteApiCall({
-      ...action,
-      type: types.SUCCESS.TYPE,
-      payload: { ...action.payload, ...response },
-      version
-    })),
+    if (!apiCall) {
+      return next(action);
+    }
 
-    error => store.dispatch(deleteApiCall({
+    const { request, types } = apiCall;
+    const version = getVersion(store);
+    const id = nextId();
+
+    store.dispatch(deleteApiCall({ ...action, meta: { ...action.meta, id, version }, type: types.REQUEST.TYPE }));
+    request().then(
+      response => store.dispatch(deleteApiCall({
+        ...action,
+        type: types.SUCCESS.TYPE,
+        payload: { ...action.payload, ...response },
+        meta: { ...action.meta, id, version }
+      })),
+
+      error => store.dispatch(deleteApiCall({
         ...action,
         type: types.FAILURE.TYPE,
         error: true,
         payload: error,
-        version
+        meta: { ...action.meta, id, version }
       }))
-  );
+    );
+  }
 }
 
 export const versionMiddleware = store => next => action => {
-  if (action.version === undefined || action.version === getVersion(store)) {
+  const meta = action.meta || {};
+  if (meta.version === undefined || meta.version === getVersion(store)) {
     next(action);
   }
 };

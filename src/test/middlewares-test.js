@@ -14,14 +14,15 @@ describe('middlewares', () => {
   }
 
   let next = () => {};
+  let apiDispatcher;
 
   beforeEach(() => {
+    apiDispatcher = middlewares.asyncActionMiddleware(store)(next);
     store.dispatch = sinon.spy(() => {});
     next = sinon.mock();
   })
 
   describe('asyncActionMiddleware', () => {
-    const apiDispatcher = middlewares.asyncActionMiddleware(store)(next);
 
     context('sync actions', () => {
       it('should pass the action to next', () => {
@@ -56,11 +57,15 @@ describe('middlewares', () => {
 
         requestPromise.then(() => {
           sinon.assert.calledTwice(store.dispatch);
-          expect(store.dispatch.firstCall.args[0]).toEqual({ type: 'FRUS_REQUEST', version: 1 });
+          expect(store.dispatch.firstCall.args[0]).toEqual({ type: 'FRUS_REQUEST', meta: { id: 1, version: 1 } });
           expect(store.dispatch.secondCall.args[0]).toEqual({
             type: 'FRUS_SUCCESS',
             payload: { key: "value" },
-            version: 1 });
+            meta: {
+              id: 1,
+              version: 1
+            }
+          });
           done();
         }).catch(e => {
           setTimeout(() => {
@@ -84,12 +89,16 @@ describe('middlewares', () => {
 
         requestPromise.then(() => {}, () => {
           sinon.assert.calledTwice(store.dispatch);
-          expect(store.dispatch.firstCall.args[0]).toEqual({ type: 'FRUS_REQUEST', version: 1 });
+          expect(store.dispatch.firstCall.args[0]).toEqual({ type: 'FRUS_REQUEST', meta: { id: 1, version: 1 } });
           expect(store.dispatch.secondCall.args[0]).toEqual({
             type: 'FRUS_FAILURE',
             error: true,
             payload: error,
-            version: 1 });
+            meta: {
+              id: 1,
+              version: 1
+            }
+          });
           done();
         }).catch(e => {
           setTimeout(() => {
