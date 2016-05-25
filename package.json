@@ -1,0 +1,28 @@
+{
+  "name": "fredux",
+  "version": "0.1.0-alpha",
+  "description": "Fabulous Redux",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "mocha ./src/test/*-test.js --compilers js:babel-register --recursive",
+    "test:watch": "mocha ./src/test/*-test.js --compilers js:babel-register --recursive --watch",
+    "clean": "rm -rf dist/*",
+    "precompile": "npm run clean",
+    "compile": "babel -d dist/ src/",
+    "prepublish": "npm run compile"
+  },
+  "author": "Trabe",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.9.0",
+    "babel-core": "^6.9.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-stage-2": "^6.5.0",
+    "babel-register": "^6.9.0",
+    "expect": "^1.20.1",
+    "fetch-mock": "^4.5.0",
+    "isomorphic-fetch": "^2.2.1",
+    "mocha": "^2.4.5",
+    "sinon": "^1.17.4"
+  }
+}
