@@ -1,6 +1,25 @@
 import { ASYNC_CALL } from "./symbols";
 
-export function asyncAction({ type, request, changeVersion = undefined, builder = () => ({}) }) {
+function setChangeVersionMeta(changeVersion, action) {
+  if (changeVersion) {
+    action.meta = { changeVersion };
+  }
+
+  return action;
+};
+
+const decorateActionCreator = fn => actionCreator => (...args) => {
+  const creator = actionCreator(...args);
+
+  return {
+    ...creator,
+    create: (...args) => fn(creator.create(...args))
+  }
+};
+
+export const contextChangingAction = decorateActionCreator(action => ({...action, meta: {...action.meta, changeVersion: true}}));
+
+export function asyncAction({ type, request, builder = o => o }) {
   const types = {
     REQUEST: { TYPE: `${type}_REQUEST` },
     SUCCESS: { TYPE: `${type}_SUCCESS` },
@@ -9,22 +28,20 @@ export function asyncAction({ type, request, changeVersion = undefined, builder 
   return {
     ...types,
     create: (...params) => ({
-      [ASYNC_CALL]: {
-        types,
-        request
-      },
-      meta: { changeVersion },
-      payload: builder(...params)
-    })
+        [ASYNC_CALL]: {
+          types,
+          request
+        },
+        payload: builder(...params)
+      })
   }
 }
 
-export function syncAction({ type, changeVersion = undefined, builder = () => ({}) }) {
+export function syncAction({ type, builder = o => o }) {
   return {
     TYPE: type,
     create: (...params) => ({
       type,
-      meta: { changeVersion },
       payload: builder(...params)
     })
   }

@@ -68,21 +68,20 @@ import { syncAction } from "fredux";
 
 export const MESSAGE = syncAction({
   type: "MESSAGE",
-  changeVersion : true,
   builder: (x, y) => ({ x, y })
 });
 
 MESSAGE.create(3, 4);
 ```
 
-`changeVersion` flag indicates that the action involves a context change
+`builder` is used to create the action payload (it defaults to the identity function)
 
 `MESSAGE.create(3, 4)` returns a flux standard action like this one:
+
 
 ```
 {
   type: "MESSAGE",
-  meta: { changeVersion: true },
   payload: {x: 3, y: 4}
 }
 ```
@@ -109,3 +108,7 @@ The asyncActionMiddleware will:
 1. Make the request and dispatch a MESSAGE_REQUEST action.
 2. If the request succeeds, the api middleware will dispatch a MESSAGE_SUCCESS action with the response as its payload.
 3. If the request fails, the api middleware will dispatch a MESSAGE_FAILURE with the error as its payload.
+
+# TODO
+
+* Document `contextChangingAction` and version change stuff

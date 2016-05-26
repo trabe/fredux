@@ -11,7 +11,6 @@ describe('actions', () => {
 
       expect(actions.syncAction({
         type: TYPE,
-        changeVersion: true,
         builder: (x,y) => x+y
       }).TYPE).toEqual(TYPE)
     })
@@ -20,16 +19,25 @@ describe('actions', () => {
 
       const syncAction = {
         type: TYPE,
-        meta: {changeVersion: true},
         payload: 3
       }
 
       expect(actions.syncAction({
         type: TYPE,
-        changeVersion: true,
         builder: (x,y) => x+y
       }).create(1, 2)).toEqual(syncAction)
     })
+
+    it('should use an identity payload builder by default', () => {
+      const syncAction = {
+        type: TYPE,
+        payload: {test: 123}
+      }
+
+      expect(actions.syncAction({
+        type: TYPE
+      }).create({test: 123})).toEqual(syncAction)
+    });
   })
 
   describe('asyncAction', () => {
@@ -43,7 +51,6 @@ describe('actions', () => {
     it('should create an async action definition', () => {
       const actionDefinition = actions.asyncAction({
         type: TYPE,
-        changeVersion: true,
         builder: (x,y) => x+y
       })
 
@@ -59,17 +66,44 @@ describe('actions', () => {
           types,
           request: request
         },
-        meta: {changeVersion: true},
         payload: 3
       }
 
       expect(actions.asyncAction({
         type: TYPE,
         request: request,
-        changeVersion: true,
         builder: (x,y) => x+y
       }).create(1, 2)).toEqual(asyncAction)
     })
+
+    it('should use an identity payload builder by default', () => {
+      const asyncAction = {
+        [ASYNC_CALL]: {
+          types,
+        },
+        payload: {test: 123}
+      }
+
+      expect(actions.asyncAction({
+        type: TYPE,
+      }).create({test: 123})).toEqual(asyncAction)
+    });
   })
+
+  describe('contextChangingAction', () => {
+    const TYPE = 'CONTEXT_CHANGING_ACTION';
+
+    it('should set a meta flag to change the version', () => {
+      const contextChangingAction = {
+        type: TYPE,
+        meta: {changeVersion: true},
+        payload: 1
+      };
+
+      expect(actions.contextChangingAction(actions.syncAction)({
+        type: TYPE
+      }).create(1)).toEqual(contextChangingAction);
+    })
+  });
 
 })
