@@ -112,3 +112,4 @@ The asyncActionMiddleware will:
 # TODO
 
 * Document `contextChangingAction` and version change stuff
+* Lint & adhere to some sort of JS style convention ^_^U

@@ -33,7 +33,7 @@ export const asyncActionMiddleware = store => next => {
       response => store.dispatch(deleteApiCall({
         ...action,
         type: types.SUCCESS.TYPE,
-        payload: { ...action.payload, ...response },
+        payload: { ...action.payload, response },
         meta: { ...action.meta, id, version }
       })),
 

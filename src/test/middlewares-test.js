@@ -60,7 +60,7 @@ describe('middlewares', () => {
           expect(store.dispatch.firstCall.args[0]).toEqual({ type: 'FRUS_REQUEST', meta: { id: 1, version: 1 } });
           expect(store.dispatch.secondCall.args[0]).toEqual({
             type: 'FRUS_SUCCESS',
-            payload: { key: "value" },
+            payload: { response: { key: "value" } },
             meta: {
               id: 1,
               version: 1
