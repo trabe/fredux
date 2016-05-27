@@ -3,3 +3,4 @@ tags
 npm-debug.log
 .tern-port
 dist
+.idea
