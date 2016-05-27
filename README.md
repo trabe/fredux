@@ -94,7 +94,7 @@ import { asyncAction } from "fredux";
 
 export const MESSAGE = asyncAction({
   type: "MESSAGE",
-  request: get("http://localhost:3031/test"),
+  request: () => yourApiCall(), // The api call should return a promise
   builder: (x, y) => ({ x, y })
 });
 
@@ -109,7 +109,25 @@ The asyncActionMiddleware will:
 2. If the request succeeds, the api middleware will dispatch a MESSAGE_SUCCESS action with the response as its payload.
 3. If the request fails, the api middleware will dispatch a MESSAGE_FAILURE with the error as its payload.
 
+## Use fredux with [normalizr](https://github.com/paularmstrong/normalizr)
+
+```
+import { asyncAction } from "fredux";
+import { get } from "fredux-api-utils";
+
+export const MESSAGE = asyncAction({
+  type: "MESSAGE",
+  request: () => yourApiCall().then(response => normalize(response, yourSchema)),
+  builder: (x, y) => ({ x, y })
+});
+
+MESSAGE.create(3, 4);
+```
+
+
+
 # TODO
 
 * Document `contextChangingAction` and version change stuff
 * Lint & adhere to some sort of JS style convention ^_^U
+* Remove api-utils usage in examples
