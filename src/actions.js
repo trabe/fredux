@@ -27,12 +27,12 @@ export function asyncAction({ type, request, builder = o => o }) {
   };
   return {
     ...types,
-    create: (...params) => ({
+    create: (props) => ({
         [ASYNC_CALL]: {
           types,
-          request
+          request: request.bind(this, props)
         },
-        payload: builder(...params)
+        payload: builder(props)
       })
   }
 }
@@ -40,9 +40,9 @@ export function asyncAction({ type, request, builder = o => o }) {
 export function syncAction({ type, builder = o => o }) {
   return {
     TYPE: type,
-    create: (...params) => ({
+    create: (props) => ({
       type,
-      payload: builder(...params)
+      payload: builder(props)
     })
   }
 }

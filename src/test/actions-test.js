@@ -2,108 +2,107 @@ import expect from "expect";
 import * as actions from "../actions";
 import { ASYNC_CALL } from "../symbols";
 
-describe('actions', () => {
+describe("actions", () => {
 
-  describe('syncAction', () => {
-    const TYPE = 'SYNC_ACTION'
+  describe("syncAction", () => {
+    const TYPE = "SYNC_ACTION";
 
-    it('should create a sync action definition', () => {
-
+    it("should create a sync action definition", () => {
       expect(actions.syncAction({
         type: TYPE,
-        builder: (x,y) => x+y
+        builder: ({ x, y }) => x + y
       }).TYPE).toEqual(TYPE)
-    })
+    });
 
-    it('should create a sync action', () => {
-
+    it("should create a sync action", () => {
       const syncAction = {
         type: TYPE,
         payload: 3
-      }
+      };
 
       expect(actions.syncAction({
         type: TYPE,
-        builder: (x,y) => x+y
-      }).create(1, 2)).toEqual(syncAction)
-    })
+        builder: ({ x, y }) => x + y
+      }).create({x: 1, y: 2})).toEqual(syncAction);
+    });
 
-    it('should use an identity payload builder by default', () => {
+    it("should use an identity payload builder by default", () => {
       const syncAction = {
         type: TYPE,
         payload: {test: 123}
-      }
+      };
 
       expect(actions.syncAction({
         type: TYPE
       }).create({test: 123})).toEqual(syncAction)
     });
-  })
+  });
 
-  describe('asyncAction', () => {
-    const TYPE = 'ASYNC_ACTION'
+  describe("asyncAction", () => {
+    const TYPE = "ASYNC_ACTION";
     const types = {
       REQUEST: { TYPE: `${TYPE}_REQUEST` },
       SUCCESS: { TYPE: `${TYPE}_SUCCESS` },
       FAILURE: { TYPE: `${TYPE}_FAILURE` }
-    }
+    };
 
-    it('should create an async action definition', () => {
+    it("should create an async action definition", () => {
       const actionDefinition = actions.asyncAction({
         type: TYPE,
-        builder: (x,y) => x+y
-      })
+        builder: ({ x, y }) => x + y
+      });
 
       expect(actionDefinition.REQUEST).toEqual(types.REQUEST);
       expect(actionDefinition.SUCCESS).toEqual(types.SUCCESS);
       expect(actionDefinition.FAILURE).toEqual(types.FAILURE);
-    })
+    });
 
-    it('should create an async action', () => {
-      const request = 'fake request';
+    it("should create an async action", () => {
+      const request = () => "fake request";
       const asyncAction = {
         [ASYNC_CALL]: {
           types,
-          request: request
+          request
         },
         payload: 3
-      }
+      };
 
       expect(actions.asyncAction({
         type: TYPE,
         request: request,
-        builder: (x,y) => x+y
-      }).create(1, 2)).toEqual(asyncAction)
-    })
+        builder: ({ x, y }) => x + y
+      }).create({x: 1, y: 2})).toEqual(asyncAction)
+    });
 
-    it('should use an identity payload builder by default', () => {
+    it("should use an identity payload builder by default", () => {
       const asyncAction = {
         [ASYNC_CALL]: {
-          types,
+          types
         },
         payload: {test: 123}
-      }
+      };
 
       expect(actions.asyncAction({
         type: TYPE,
-      }).create({test: 123})).toEqual(asyncAction)
+        request: () => Promise.resolve()
+      }).create({test: 123})).toEqual(asyncAction);
     });
-  })
+  });
 
-  describe('contextChangingAction', () => {
-    const TYPE = 'CONTEXT_CHANGING_ACTION';
+  describe("contextChangingAction", () => {
+    const TYPE = "CONTEXT_CHANGING_ACTION";
 
-    it('should set a meta flag to change the version', () => {
+    it("should set a meta flag to change the version", () => {
       const contextChangingAction = {
         type: TYPE,
         meta: {changeVersion: true},
-        payload: 1
+        payload: {x: 1}
       };
 
       expect(actions.contextChangingAction(actions.syncAction)({
         type: TYPE
-      }).create(1)).toEqual(contextChangingAction);
+      }).create({x: 1})).toEqual(contextChangingAction);
     })
   });
 
-})
+});
