@@ -1,108 +1,49 @@
 import expect from "expect";
-import * as actions from "../actions";
-import { ASYNC_CALL } from "../symbols";
+import { promiseAction, contextChangingAction, startIntervalAction, stopIntervalAction } from "../actions";
+import { PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "../symbols";
 
 describe("actions", () => {
+  describe("promiseAction decorator", () => {
+    context("an action decorated with 'promiseAction'", () => {
+      const call = () => Promise.accept();
+      const actionCreator = () => promiseAction(call)({ type: "ACTION" });
 
-  describe("syncAction", () => {
-    const TYPE = "SYNC_ACTION";
-
-    it("should create a sync action definition", () => {
-      expect(actions.syncAction({
-        type: TYPE,
-        builder: ({ x, y }) => x + y
-      }).TYPE).toEqual(TYPE)
-    });
-
-    it("should create a sync action", () => {
-      const syncAction = {
-        type: TYPE,
-        payload: 3
-      };
-
-      expect(actions.syncAction({
-        type: TYPE,
-        builder: ({ x, y }) => x + y
-      }).create({x: 1, y: 2})).toEqual(syncAction);
-    });
-
-    it("should use an identity payload builder by default", () => {
-      const syncAction = {
-        type: TYPE,
-        payload: {test: 123}
-      };
-
-      expect(actions.syncAction({
-        type: TYPE
-      }).create({test: 123})).toEqual(syncAction)
-    });
-  });
-
-  describe("asyncAction", () => {
-    const TYPE = "ASYNC_ACTION";
-    const types = {
-      REQUEST: { TYPE: `${TYPE}_REQUEST` },
-      SUCCESS: { TYPE: `${TYPE}_SUCCESS` },
-      FAILURE: { TYPE: `${TYPE}_FAILURE` }
-    };
-
-    it("should create an async action definition", () => {
-      const actionDefinition = actions.asyncAction({
-        type: TYPE,
-        builder: ({ x, y }) => x + y
+      it("should return an action with the promise call in the [PROMISE_CALL] property", () => {
+        expect(actionCreator()[PROMISE_CALL]).toEqual(call);
       });
-
-      expect(actionDefinition.REQUEST).toEqual(types.REQUEST);
-      expect(actionDefinition.SUCCESS).toEqual(types.SUCCESS);
-      expect(actionDefinition.FAILURE).toEqual(types.FAILURE);
-    });
-
-    it("should create an async action", () => {
-      const request = () => "fake request";
-      const asyncAction = {
-        [ASYNC_CALL]: {
-          types,
-          request
-        },
-        payload: 3
-      };
-
-      expect(actions.asyncAction({
-        type: TYPE,
-        request: request,
-        builder: ({ x, y }) => x + y
-      }).create({x: 1, y: 2})).toEqual(asyncAction)
-    });
-
-    it("should use an identity payload builder by default", () => {
-      const asyncAction = {
-        [ASYNC_CALL]: {
-          types
-        },
-        payload: {test: 123}
-      };
-
-      expect(actions.asyncAction({
-        type: TYPE,
-        request: () => Promise.resolve()
-      }).create({test: 123})).toEqual(asyncAction);
     });
   });
 
-  describe("contextChangingAction", () => {
-    const TYPE = "CONTEXT_CHANGING_ACTION";
+  describe("contextChanging decorator", () => {
+    context("an action decorated with 'contextChangingAction'", () => {
+      it("should return an action with the change context flag set to true", () => {
+        const actionCreator = () => contextChangingAction({ type: "ACTION", payload: {} });
 
-    it("should set a meta flag to change the version", () => {
-      const contextChangingAction = {
-        type: TYPE,
-        meta: {changeVersion: true},
-        payload: {x: 1}
-      };
-
-      expect(actions.contextChangingAction(actions.syncAction)({
-        type: TYPE
-      }).create({x: 1})).toEqual(contextChangingAction);
-    })
+        expect(actionCreator().meta.changeVersion).toBe(true);
+      });
+    });
   });
 
+  describe("startIntervalAction decorator", () => {
+    context("an action decorated with 'startIntervalAction'", () => {
+      const actionCreator = () => startIntervalAction({ id: "my_poller", timeout: 2000 })({ type: "ACTION", payload: {} });
+
+      it("should return an action with the id and timeout in the [SET_INTERVAL] property", () => {
+        const action = actionCreator();
+
+        expect(action[SET_INTERVAL].id).toEqual("my_poller");
+        expect(action[SET_INTERVAL].timeout).toEqual(2000);
+      });
+    });
+
+    context("an action decorated with 'stopIntervalAction'", () => {
+      const actionCreator = () => stopIntervalAction("my_poller")({ type: "ACTION" });
+
+      it("should return an action with the id in the [UNSET_INTERVAL] property", () => {
+        const action = actionCreator();
+
+        expect(action[UNSET_INTERVAL]).toEqual("my_poller");
+      });
+    });
+  });
 });
