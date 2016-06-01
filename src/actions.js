@@ -1,48 +1,27 @@
-import { ASYNC_CALL } from "./symbols";
+import { PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "./symbols";
 
-function setChangeVersionMeta(changeVersion, action) {
-  if (changeVersion) {
-    action.meta = { changeVersion };
-  }
+const is = fn => (action, type) => fn(action.type) === type;
 
-  return action;
-};
+// Promise Action Decorator
+export const promiseAction = call => action => ({ ...action, [PROMISE_CALL]: call });
 
-const decorateActionCreator = fn => actionCreator => (...args) => {
-  const creator = actionCreator(...args);
+// Promise Action Types
+export const requestType = type => `${type}_REQUEST`;
+export const successType = type => `${type}_SUCCESS`;
+export const failureType = type => `${type}_FAILURE`;
+export const isRequestType = is(requestType);
+export const isSuccessType = is(successType);
+export const isFailureType = is(failureType);
 
-  return {
-    ...creator,
-    create: (...args) => fn(creator.create(...args))
-  }
-};
+// Context Changing Action decorator
+export const contextChangingAction = action => ({ ...action, meta: { ...action.meta, changeVersion: true } });
 
-export const contextChangingAction = decorateActionCreator(action => ({...action, meta: {...action.meta, changeVersion: true}}));
+// Interval Action decorators
+export const startIntervalAction = ({ timeout, id }) => action => ({ ...action, [SET_INTERVAL]: { id, timeout } });
+export const stopIntervalAction = id => action => ({ ...action, [UNSET_INTERVAL]: id });
 
-export function asyncAction({ type, request, builder = o => o }) {
-  const types = {
-    REQUEST: { TYPE: `${type}_REQUEST` },
-    SUCCESS: { TYPE: `${type}_SUCCESS` },
-    FAILURE: { TYPE: `${type}_FAILURE` }
-  };
-  return {
-    ...types,
-    create: (props) => ({
-        [ASYNC_CALL]: {
-          types,
-          request: request.bind(this, props)
-        },
-        payload: builder(props)
-      })
-  }
-}
-
-export function syncAction({ type, builder = o => o }) {
-  return {
-    TYPE: type,
-    create: (props) => ({
-      type,
-      payload: builder(props)
-    })
-  }
-}
+// Interval Action types
+export const startType = type => `${type}_START`;
+export const stopType = type => `${type}_STOP`;
+export const isStartType = is(startType);
+export const isStopType = is(stopType);
