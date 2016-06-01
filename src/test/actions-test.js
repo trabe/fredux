@@ -1,49 +1,48 @@
 import expect from "expect";
-import { promiseAction, contextChangingAction, startIntervalAction, stopIntervalAction } from "../actions";
-import { PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "../symbols";
+import * as actions from "../actions";
 
 describe("actions", () => {
-  describe("promiseAction decorator", () => {
-    context("an action decorated with 'promiseAction'", () => {
-      const call = () => Promise.accept();
-      const actionCreator = () => promiseAction(call)({ type: "ACTION" });
+  context("promise actions", () => {
+    it("should build a request type", () => {
+      expect(actions.requestType("FRUS")).toEqual("FRUS_REQUEST");
+    });
+    
+    it("should build a success type", () => {
+      expect(actions.successType("FRUS")).toEqual("FRUS_SUCCESS");
+    });
 
-      it("should return an action with the promise call in the [PROMISE_CALL] property", () => {
-        expect(actionCreator()[PROMISE_CALL]).toEqual(call);
-      });
+    it("should build a failure type", () => {
+      expect(actions.failureType("FRUS")).toEqual("FRUS_FAILURE");
+    });
+    
+    it("should return true if the action type is a request type", () => {
+      expect(actions.isRequestType("FRUS_REQUEST", "FRUS"));
+    });
+
+    it("should return true if the action type is a success type", () => {
+      expect(actions.isSuccessType("FRUS_SUCCESS", "FRUS"));
+    });
+    
+    it("should return true if the action type is a failure type", () => {
+      expect(actions.isFailureType("FRUS_FAILURE", "FRUS"));
     });
   });
-
-  describe("contextChanging decorator", () => {
-    context("an action decorated with 'contextChangingAction'", () => {
-      it("should return an action with the change context flag set to true", () => {
-        const actionCreator = () => contextChangingAction({ type: "ACTION", payload: {} });
-
-        expect(actionCreator().meta.changeVersion).toBe(true);
-      });
-    });
-  });
-
-  describe("startIntervalAction decorator", () => {
-    context("an action decorated with 'startIntervalAction'", () => {
-      const actionCreator = () => startIntervalAction({ id: "my_poller", timeout: 2000 })({ type: "ACTION", payload: {} });
-
-      it("should return an action with the id and timeout in the [SET_INTERVAL] property", () => {
-        const action = actionCreator();
-
-        expect(action[SET_INTERVAL].id).toEqual("my_poller");
-        expect(action[SET_INTERVAL].timeout).toEqual(2000);
-      });
+  
+  context("interval actions", () => {
+    it("should build a start type", () => {
+      expect(actions.startType("FRUS")).toEqual("FRUS_START");
     });
 
-    context("an action decorated with 'stopIntervalAction'", () => {
-      const actionCreator = () => stopIntervalAction("my_poller")({ type: "ACTION" });
-
-      it("should return an action with the id in the [UNSET_INTERVAL] property", () => {
-        const action = actionCreator();
-
-        expect(action[UNSET_INTERVAL]).toEqual("my_poller");
-      });
+    it("should build a stop type", () => {
+      expect(actions.stopType("FRUS")).toEqual("FRUS_STOP");
     });
-  });
+
+    it("should return true if the action type is a start type", () => {
+      expect(actions.isStartType("FRUS_START", "FRUS"));
+    });
+
+    it("should return true if the action type is a stop type", () => {
+      expect(actions.isStopType("FRUS_STOP", "FRUS"));
+    });
+  })
 });

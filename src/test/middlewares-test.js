@@ -1,7 +1,7 @@
 import expect from "expect";
 import sinon from "sinon";
 import * as middlewares from "../middlewares";
-import { PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "../symbols";
+import { CHANGE_VERSION, PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "../symbols";
 
 const { calledOnce, calledTwice, calledWith, notCalled } = sinon.assert;
 
@@ -128,6 +128,15 @@ describe("middlewares", () => {
       versionDispatcher(action);
 
       notCalled(next);
+    });
+
+    it("should add the changeVersion flag to meta if the action has a [CHANGE_VERSION] property", () => {
+      const action = { [CHANGE_VERSION]: true, type: "FRUS" };
+
+      versionDispatcher(action);
+
+      calledOnce(next);
+      calledWith(next, { type: "FRUS", meta: { changeVersion: true }});
     });
   });
 
