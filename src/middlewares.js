@@ -1,4 +1,4 @@
-import { PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "./symbols";
+import { PROMISE_CALL, CHANGE_VERSION, SET_INTERVAL, UNSET_INTERVAL } from "./symbols";
 import { startType, stopType, requestType, successType, failureType } from "./actions";
 
 function deleteApiCall(action) {
@@ -51,7 +51,7 @@ export const promiseActionMiddleware = store => next => {
 export const versionMiddleware = store => next => action => {
   const meta = action.meta || {};
   if (meta.version === undefined || meta.version === getVersion(store)) {
-    next(action);
+    next(action[CHANGE_VERSION] ? {...action, meta: {...action.meta, changeVersion: true}} : action);
   }
 };
 

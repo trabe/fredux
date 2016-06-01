@@ -63,10 +63,13 @@ const reducer = combineReducers({ version, otherStuff });
 #### Promise actions
 
 ```
-import { promiseAction } from "fredux";
+import { PROMISE_CALL } from "fredux";
 
 export const getMessage(id) {
-  return promiseAction(() => yourApiCall(id))({ type: "MESSAGE" })
+  return {
+      [PROMISE_CALL]: () => yourApiCall(id),
+      type: "MESSAGE"
+  };
 }
 ```
 
@@ -79,14 +82,18 @@ The promiseActionMiddleware will:
 ## Using fredux with [normalizr](https://github.com/paularmstrong/normalizr)
 
 ```
-import { promiseAction } from "fredux";
+import { PROMISE_CALL } from "fredux";
 
 export const getMessage(id) {
-  return promiseAction(yourApiCall(id).then(r => normalize(r, schema))({ type: "MESSAGE" })
+
+  return {
+      [PROMISE_CALL]: () => yourApiCall(id).then(r => normalize(r, schema)),
+      type: "MESSAGE"
+  };
 }
 ```
 
 # TODO
 
-* Document `contextChangingAction` and version change stuff
+* Document `CHANGE_VERSION` and version change stuff
 * Lint & adhere to some sort of JS style convention ^_^U
