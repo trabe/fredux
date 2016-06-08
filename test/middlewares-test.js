@@ -68,24 +68,29 @@ describe("middlewares", () => {
         });
       });
 
-      it("should dispatch the failure action", function(done) {
+      it.only("should dispatch the failure action", function(done) {
+        const payload = { key: "value" };
         const error = new Error("frus error");
         const requestPromise = Promise.reject(error);
 
         const action = {
           [PROMISE_CALL]: () => requestPromise,
-          type: "FRUS"
+          type: "FRUS",
+          payload
         };
 
         apiDispatcher(action);
 
         requestPromise.then(() => {}, () => {
           calledTwice(store.dispatch);
-          expect(store.dispatch.firstCall.args[0]).toEqual({ type: "FRUS_REQUEST", meta: { id: 1, version: 1 } });
+          expect(store.dispatch.firstCall.args[0]).toEqual({ type: "FRUS_REQUEST", meta: { id: 1, version: 1 }, payload });
           expect(store.dispatch.secondCall.args[0]).toEqual({
             type: "FRUS_FAILURE",
             error: true,
-            payload: error,
+            payload: {
+              ...payload,
+              error
+            },
             meta: {
               id: 1,
               version: 1
