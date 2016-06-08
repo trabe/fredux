@@ -4,14 +4,14 @@
   "description": "Fabulous Redux",
   "main": "dist/index.js",
   "scripts": {
-    "test": "mocha ./src/test/*-test.js --compilers js:babel-register --recursive",
-    "test:watch": "mocha ./src/test/*-test.js --compilers js:babel-register --recursive --watch",
+    "test": "mocha ./test/*-test.js --compilers js:babel-register --recursive",
+    "test:watch": "mocha ./test/*-test.js --compilers js:babel-register --recursive --watch",
     "clean": "rm -rf dist/*",
     "precompile": "npm run clean",
     "compile": "babel -d dist/ src/",
     "prepublish": "npm run compile"
   },
-  "author": "Trabe",
+"author": "Trabe",
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.9.0",

@@ -1,7 +1,7 @@
 import expect from "expect";
 import sinon from "sinon";
-import * as middlewares from "../middlewares";
-import { CHANGE_VERSION, PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "../symbols";
+import * as middlewares from "../src/middlewares";
+import { CHANGE_VERSION, PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "../src/symbols";
 
 const { calledOnce, calledTwice, calledWith, notCalled } = sinon.assert;
 
