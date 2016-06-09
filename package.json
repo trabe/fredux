@@ -1,6 +1,6 @@
 {
   "name": "fredux",
-  "version": "0.3.0-alpha",
+  "version": "0.4.0-alpha",
   "description": "Fabulous Redux",
   "main": "dist/index.js",
   "scripts": {
