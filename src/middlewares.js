@@ -41,7 +41,7 @@ export const promiseActionMiddleware = store => next => {
         ...action,
         type: failureType(action.type),
         error: true,
-        payload: error,
+        payload: { ...action.payload, error },
         meta: { ...action.meta, id, version }
       }))
     );

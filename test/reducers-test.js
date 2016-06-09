@@ -1,5 +1,5 @@
 import expect from "expect";
-import { version } from "../reducers";
+import { version } from "../src/reducers";
 
 const actionWichChangeTheVersion = {
   type: "ACTION_FRUS",

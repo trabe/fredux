@@ -1,7 +1,7 @@
 import expect from "expect";
 import sinon from "sinon";
-import * as middlewares from "../middlewares";
-import { CHANGE_VERSION, PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "../symbols";
+import * as middlewares from "../src/middlewares";
+import { CHANGE_VERSION, PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "../src/symbols";
 
 const { calledOnce, calledTwice, calledWith, notCalled } = sinon.assert;
 
@@ -40,21 +40,27 @@ describe("middlewares", () => {
 
     context("promise actions", () => {
       it("should dispatch the success action", function(done) {
-        const requestPromise = Promise.resolve({key: "value"});
+        const payload = { key: "value" };
+        const response = { responseKey: "response value" };
+        const requestPromise = Promise.resolve(response);
 
         const action = {
           [PROMISE_CALL]: () => requestPromise,
-          type: "FRUS"
+          type: "FRUS",
+          payload
         };
 
         apiDispatcher(action);
 
         requestPromise.then(() => {
           calledTwice(store.dispatch);
-          expect(store.dispatch.firstCall.args[0]).toEqual({ type: "FRUS_REQUEST", meta: { id: 1, version: 1 } });
+          expect(store.dispatch.firstCall.args[0]).toEqual({ type: "FRUS_REQUEST", meta: { id: 1, version: 1 }, payload });
           expect(store.dispatch.secondCall.args[0]).toEqual({
             type: "FRUS_SUCCESS",
-            payload: { response: { key: "value" } },
+            payload: {
+              ...payload,
+              response
+            },
             meta: {
               id: 1,
               version: 1
@@ -69,23 +75,28 @@ describe("middlewares", () => {
       });
 
       it("should dispatch the failure action", function(done) {
+        const payload = { key: "value" };
         const error = new Error("frus error");
         const requestPromise = Promise.reject(error);
 
         const action = {
           [PROMISE_CALL]: () => requestPromise,
-          type: "FRUS"
+          type: "FRUS",
+          payload
         };
 
         apiDispatcher(action);
 
         requestPromise.then(() => {}, () => {
           calledTwice(store.dispatch);
-          expect(store.dispatch.firstCall.args[0]).toEqual({ type: "FRUS_REQUEST", meta: { id: 1, version: 1 } });
+          expect(store.dispatch.firstCall.args[0]).toEqual({ type: "FRUS_REQUEST", meta: { id: 1, version: 1 }, payload });
           expect(store.dispatch.secondCall.args[0]).toEqual({
             type: "FRUS_FAILURE",
             error: true,
-            payload: error,
+            payload: {
+              ...payload,
+              error
+            },
             meta: {
               id: 1,
               version: 1
