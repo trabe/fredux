@@ -16,15 +16,15 @@ describe("actions", () => {
     });
 
     it("should return true if the action type is a request type", () => {
-      expect(actions.isRequestType("FRUS_REQUEST", "FRUS"));
+      expect(actions.isRequestType({ type: "FRUS_REQUEST" }, "FRUS")).toBe(true);
     });
 
     it("should return true if the action type is a success type", () => {
-      expect(actions.isSuccessType("FRUS_SUCCESS", "FRUS"));
+      expect(actions.isSuccessType({ type: "FRUS_SUCCESS" }, "FRUS")).toBe(true);
     });
 
     it("should return true if the action type is a failure type", () => {
-      expect(actions.isFailureType("FRUS_FAILURE", "FRUS"));
+      expect(actions.isFailureType({ type: "FRUS_FAILURE" }, "FRUS")).toBe(true);
     });
   });
 
@@ -38,11 +38,11 @@ describe("actions", () => {
     });
 
     it("should return true if the action type is a start type", () => {
-      expect(actions.isStartType("FRUS_START", "FRUS"));
+      expect(actions.isStartType({ type: "FRUS_START" }, "FRUS")).toBe(true);
     });
 
     it("should return true if the action type is a stop type", () => {
-      expect(actions.isStopType("FRUS_STOP", "FRUS"));
+      expect(actions.isStopType({ type: "FRUS_STOP" }, "FRUS")).toBe(true);
     });
   })
 });

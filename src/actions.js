@@ -1,4 +1,4 @@
-const is = fn => (action, type) => fn(action.type) === type;
+const is = fn => (action, type) => action.type === fn(type);
 
 // Promise Action Types
 export const requestType = type => `${type}_REQUEST`;
