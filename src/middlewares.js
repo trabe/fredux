@@ -1,8 +1,8 @@
-import { PROMISE_CALL, CHANGE_VERSION, SET_INTERVAL, UNSET_INTERVAL } from "./symbols";
+import { PROMISE_CALL, CHANGE_VERSION } from "./symbols";
 import { startType, stopType, requestType, successType, failureType } from "./actions";
 
 function deleteApiCall(action) {
-  const newAction = {...action};
+  const newAction = { ...action };
   delete newAction[PROMISE_CALL];
   return newAction;
 }
@@ -53,30 +53,4 @@ export const versionMiddleware = store => next => action => {
   if (meta.version === undefined || meta.version === getVersion(store)) {
     next(action[CHANGE_VERSION] ? {...action, meta: {...action.meta, changeVersion: true}} : action);
   }
-};
-
-// TODO: Add some kind of validation when starting two pollers with the same id/stopping a poller that does not exist
-export const intervalMiddleware = store => next => {
-  const intervals = new Map();
-  return action => {
-    if (action[SET_INTERVAL]) {
-      const { timeout, id } = action[SET_INTERVAL];
-      if (!intervals.has(id)) {
-        store.dispatch({ type: startType(action.type), meta: { id, timeout } });
-        const interval = setInterval(() => store.dispatch(action), timeout);
-        intervals.set(id, interval);
-      }
-    }
-    else if (action[UNSET_INTERVAL]) {
-      const id = action[UNSET_INTERVAL];
-      if (intervals.has(id)) {
-        clearInterval(intervals.get(id));
-        intervals.delete(id);
-        store.dispatch({ type: stopType(action.type), meta: { id } });
-      }
-    }
-    else {
-      next(action);
-    }
-  };
 };

@@ -10,7 +10,7 @@
   * Create asynchronous actions
   * Handle pending promise actions when the context of the application changes like in a page navigation.
 
-Fredux is a utility library to make the development process of redux applications faster and easier. Fredux provides some conventions and tools to solve the problems mentioned before.
+Fredux is a utility library to make the development process of redux applications faster and easier. Fredux provides some conventions and tools to solve the above-mentioned problems.
 
 ## Features
 
@@ -77,7 +77,7 @@ The promiseActionMiddleware will:
 
 1. Make the request and dispatch a MESSAGE_REQUEST action.
 2. If the request succeeds, the promise middleware will dispatch a MESSAGE_SUCCESS action with the response in the payload.
-3. If the request fails, the api middleware will dispatch a MESSAGE_FAILURE with the error as its payload.
+3. If the request fails, the promise middleware will dispatch a MESSAGE_FAILURE with the error as its payload.
 
 ## Using fredux with [normalizr](https://github.com/paularmstrong/normalizr)
 
@@ -93,7 +93,3 @@ export const getMessage(id) {
 }
 ```
 
-# TODO
-
-* Document `CHANGE_VERSION` and version change stuff
-* Lint & adhere to some sort of JS style convention ^_^U

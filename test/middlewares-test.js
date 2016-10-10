@@ -1,7 +1,7 @@
 import expect from "expect";
 import sinon from "sinon";
 import * as middlewares from "../src/middlewares";
-import { CHANGE_VERSION, PROMISE_CALL, SET_INTERVAL, UNSET_INTERVAL } from "../src/symbols";
+import { CHANGE_VERSION, PROMISE_CALL } from "../src/symbols";
 
 const { calledOnce, calledTwice, calledWith, notCalled } = sinon.assert;
 
@@ -150,79 +150,4 @@ describe("middlewares", () => {
       calledWith(next, { type: "FRUS", meta: { changeVersion: true }});
     });
   });
-
-  describe("intervalMiddleware", () => {
-    let realSetInterval, realClearInterval, intervalDispatcher;
-
-    const setIntervalAction = { type: "FRUS", [SET_INTERVAL]: { id: "my_poll", timeout: 2000 } };
-    const unsetIntervalAction = { type: "FRUS", [UNSET_INTERVAL]: "my_poll" };
-    const startAction = { type: "FRUS_START", meta: { id: "my_poll", timeout: 2000 } };
-    const stopAction = { type: "FRUS_STOP", meta: { id: "my_poll" } };
-
-    before(() => {
-      realSetInterval = setInterval;
-      realClearInterval = clearInterval;
-      setInterval = sinon.spy(() => 1);
-      clearInterval = sinon.spy();
-    });
-
-    beforeEach(() => {
-      intervalDispatcher = middlewares.intervalMiddleware(store)(next);
-      setInterval.reset();
-      clearInterval.reset();
-    });
-
-    after(() => {
-      setInterval = realSetInterval;
-      clearInterval = realClearInterval;
-    });
-
-    it("should pass the action to next if there is no [SET_INTERVAL] or [UNSET_INTERVAL] property", () => {
-      const action = { type: "FRUS" };
-
-      intervalDispatcher(action);
-
-      calledOnce(next);
-      calledWith(next, action);
-    });
-
-    it("should dispatch the start action and set the interval if there is a [SET_INTERVAL] property and a poller for the id does not exist", () => {
-      intervalDispatcher(setIntervalAction);
-
-      notCalled(next);
-      calledOnce(store.dispatch);
-      calledOnce(setInterval);
-      calledWith(store.dispatch, startAction);
-    });
-
-    it("should not dispatch the start action and set the interval if there is a [SET_INTERVAL] property but a poller for the id already exists", () => {
-      intervalDispatcher(setIntervalAction);
-      intervalDispatcher(setIntervalAction);
-
-      notCalled(next);
-      calledOnce(store.dispatch);
-      calledOnce(setInterval);
-      calledWith(store.dispatch, startAction);
-    });
-
-    it("should dispatch the stop action if there is a [UNSET_INTERVAL] property and a poller for the id exists", () => {
-      intervalDispatcher(setIntervalAction);
-      intervalDispatcher(unsetIntervalAction);
-
-      notCalled(next);
-      calledOnce(clearInterval);
-      calledTwice(store.dispatch);
-      calledWith(store.dispatch.firstCall, startAction);
-      calledWith(store.dispatch.secondCall, stopAction);
-    });
-
-    it("should not dispatch the stop action if there is a [UNSET_INTERVAL] property but a poller for the id does not exist", () => {
-      intervalDispatcher(unsetIntervalAction);
-
-      notCalled(next);
-      notCalled(store.dispatch);
-      notCalled(clearInterval);
-    });
-  });
-
 });

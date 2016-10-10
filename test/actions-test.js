@@ -28,21 +28,4 @@ describe("actions", () => {
     });
   });
 
-  context("interval actions", () => {
-    it("should build a start type", () => {
-      expect(actions.startType("FRUS")).toEqual("FRUS_START");
-    });
-
-    it("should build a stop type", () => {
-      expect(actions.stopType("FRUS")).toEqual("FRUS_STOP");
-    });
-
-    it("should return true if the action type is a start type", () => {
-      expect(actions.isStartType({ type: "FRUS_START" }, "FRUS")).toBe(true);
-    });
-
-    it("should return true if the action type is a stop type", () => {
-      expect(actions.isStopType({ type: "FRUS_STOP" }, "FRUS")).toBe(true);
-    });
-  })
 });
