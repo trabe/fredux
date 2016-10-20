@@ -62,6 +62,7 @@ describe("middlewares", () => {
               response
             },
             meta: {
+              freduxAction: true,
               id: 1,
               version: 1
             }
@@ -98,6 +99,7 @@ describe("middlewares", () => {
               error
             },
             meta: {
+              freduxAction: true,
               id: 1,
               version: 1
             }

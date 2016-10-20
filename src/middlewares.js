@@ -34,7 +34,7 @@ export const promiseActionMiddleware = store => next => {
         ...action,
         type: successType(action.type),
         payload: { ...action.payload, response },
-        meta: { ...action.meta, id, version }
+        meta: { ...action.meta, freduxAction: true, id, version }
       })),
 
       error => store.dispatch(deleteApiCall({
@@ -42,7 +42,7 @@ export const promiseActionMiddleware = store => next => {
         type: failureType(action.type),
         error: true,
         payload: { ...action.payload, error },
-        meta: { ...action.meta, id, version }
+        meta: { ...action.meta, freduxAction: true, id, version }
       }))
     );
   }

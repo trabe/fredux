@@ -93,3 +93,14 @@ export const getMessage(id) {
 }
 ```
 
+### Utils
+
+#### isFreduxAction
+
+Checks if the given action is a fredux action
+
+```
+  import { isFreduxAction } from "fredux";
+
+  isFreduxAction(action);
+```
