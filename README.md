@@ -34,18 +34,22 @@ import { promiseActionMiddleware } from "fredux";
 const store = createStore(reducer, applyMiddleware(promiseActionMiddleware));
 ```
 
-### Fredux version middleware
+### Fredux versioned promise action middleware
 
-Use the fredux version middleware if you want to handle context changes, for example a navigation to another page.
+Use the fredux versioned promise action  middleware if you want to handle context changes, for example a navigation to another page.
 
-When an action involves a context change, version middleware cancels all pending promise actions which have been dispatched in previous versions.
+When an action involves a context change, the middleware cancels all pending promise actions which have been dispatched in previous versions.
 
-Add the version middleware after the api middleware to the store
+Be aware that this middleware takes the version selector as the first parameter to allow the version reducer to
+be anywhare in the reducer tree.
+
 
 ```
-import { promiseActionMiddleware, versionMiddleware } from "fredux";
+import { versionedPromiseActionMiddleware } from "fredux";
 
-const store = createStore(reducer, applyMiddleware(promiseActionMiddleware, versionMiddleware));
+const selector = state => state.version;
+const store = createStore(reducer, applyMiddleware(
+  versionedPromiseActionMiddleware(selector), versionMiddleware));
 ```
 
 Combine the reducer
@@ -73,7 +77,7 @@ export const getMessage(id) {
 }
 ```
 
-The promiseActionMiddleware will:
+Both middlewares will:
 
 1. Make the request and dispatch a MESSAGE_REQUEST action.
 2. If the request succeeds, the promise middleware will dispatch a MESSAGE_SUCCESS action with the response in the payload.
@@ -104,3 +108,19 @@ Checks if the given action is a fredux action
 
   isFreduxAction(action);
 ```
+
+# Changelog
+
+## 2.0.0 (19/05/2017)
+
+* versionMiddleware has been deprecated. Now you either use the promiseActionMiddleware or
+  the versionedPromiseActionMiddleware
+
+## 1.1.0 (20/10/2016)
+
+* Added freduxAction flag to actions which have been dispatched by fredux middleware.
+* Added isFreduxAction function that checks if an action is a fredux action based on the freduxAction flag.
+
+## 1.0.0 (10/10/2016)
+
+* Initial release

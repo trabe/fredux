@@ -7,8 +7,40 @@ function deleteApiCall(action) {
   return newAction;
 }
 
-function getVersion(store) {
-  return store.getState().version;
+const addMeta = key => value => ({ meta, ...action }) => ({ meta: { ...meta, [key]: value }, ...action });
+const addMetaFlag = key => addMeta(key)(true);
+
+const setFredux = addMetaFlag("freduxAction");
+const setChangeVersion = addMetaFlag("changeVersion");
+
+const setId = addMeta("id");
+const setVersion = addMeta("version");
+
+const isPromiseAction = action => Boolean(action[PROMISE_CALL]);
+const isDiscardeableAction = ({ meta = {}}, version) => meta.version !== undefined && meta.version !== version;
+
+
+const processPromiseAction = (store, action, decorate) => {
+
+  const enhance = action => decorate(deleteApiCall(action));
+  const promiseCall = action[PROMISE_CALL];
+
+  store.dispatch(enhance({ ...action, type: requestType(action.type) }));
+
+  promiseCall().then(
+    response => store.dispatch(enhance({
+      ...action,
+      type: successType(action.type),
+      payload: { ...action.payload, response },
+    })),
+
+    error => store.dispatch(enhance({
+      ...action,
+      type: failureType(action.type),
+      error: true,
+      payload: { ...action.payload, error },
+    }))
+  );
 }
 
 export const promiseActionMiddleware = store => next => {
@@ -19,38 +51,38 @@ export const promiseActionMiddleware = store => next => {
   }
 
   return action => {
-    const promiseCall = action[PROMISE_CALL];
-
-    if (!promiseCall) {
+    if (!isPromiseAction(action)) {
       return next(action);
     }
 
-    const version = getVersion(store);
     const id = nextId();
-
-    store.dispatch(deleteApiCall({ ...action, meta: { ...action.meta, id, version }, type: requestType(action.type) }));
-    promiseCall().then(
-      response => store.dispatch(deleteApiCall({
-        ...action,
-        type: successType(action.type),
-        payload: { ...action.payload, response },
-        meta: { ...action.meta, freduxAction: true, id, version }
-      })),
-
-      error => store.dispatch(deleteApiCall({
-        ...action,
-        type: failureType(action.type),
-        error: true,
-        payload: { ...action.payload, error },
-        meta: { ...action.meta, freduxAction: true, id, version }
-      }))
-    );
+    const decorate = action => setFredux(setId(id)(action));
+    processPromiseAction(store, action, decorate);
   }
 };
 
-export const versionMiddleware = store => next => action => {
-  const meta = action.meta || {};
-  if (meta.version === undefined || meta.version === getVersion(store)) {
-    next(action[CHANGE_VERSION] ? {...action, meta: {...action.meta, changeVersion: true}} : action);
+
+export const versionedPromiseActionMiddleware = versionSelector => store => next => {
+
+  let i = 0;
+
+  function nextId() {
+    return ++i;
+  }
+
+  return action => {
+    if (isPromiseAction(action)) {
+      const version = versionSelector(store.getState());
+      const id = nextId();
+      const decorate = action => setFredux(setId(id)(setVersion(version)(action)));
+      processPromiseAction(store, action, decorate);
+      return;
+    }
+
+    if (isDiscardeableAction(action, versionSelector(store.getState()))) {
+      return;
+    }
+
+    next(action[CHANGE_VERSION] ? setChangeVersion(action) : action);
   }
 };
