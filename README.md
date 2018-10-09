@@ -111,6 +111,11 @@ Checks if the given action is a fredux action
 
 # Changelog
 
+## 2.0.1 (9/10/2018)
+
+* Bugfix: versionedPromiseActionMiddleware was not returning the next() result when processing
+  normal actions ([PR #5](https://github.com/trabe/fredux/pull/5)).
+
 ## 2.0.0 (19/05/2017)
 
 * versionMiddleware has been deprecated. Now you either use the promiseActionMiddleware or
