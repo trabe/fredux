@@ -83,6 +83,6 @@ export const versionedPromiseActionMiddleware = versionSelector => store => next
       return;
     }
 
-    next(action[CHANGE_VERSION] ? setChangeVersion(action) : action);
+    return next(action[CHANGE_VERSION] ? setChangeVersion(action) : action);
   }
 };
