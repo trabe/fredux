@@ -14,7 +14,8 @@ describe("middlewares", () => {
     dispatch: sinon.spy()
   };
 
-  const next = sinon.spy();
+  const next = sinon.spy(() => "ret");
+
   let apiDispatcher;
 
   describe("promiseActionMiddleware", () => {
@@ -28,11 +29,12 @@ describe("middlewares", () => {
       it("should pass the action to next", () => {
         const action = { type: "FRUS" };
 
-        apiDispatcher(action);
+        const ret = apiDispatcher(action);
 
         calledOnce(next);
         calledWith(next, action);
         notCalled(store.dispatch);
+        expect(ret).toEqual("ret");
       });
     });
 
@@ -122,11 +124,12 @@ describe("middlewares", () => {
       it("should pass the action to next", () => {
         const action = { type: "FRUS" };
 
-        apiDispatcher(action);
+        const ret = apiDispatcher(action);
 
         calledOnce(next);
         calledWith(next, action);
         notCalled(store.dispatch);
+        expect(ret).toEqual("ret");
       });
     });
 
